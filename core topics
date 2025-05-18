@@ -1,0 +1,31 @@
+It is a master worker node architecure.
+
+Master contains API server, Controllar Manager, Schedular and ETCD.
+Pods will run on the worker nodes.
+
+kubectl get pods -n default -o wide      
+kubectl create -f pod.yaml
+kubectl apply -f pod.yaml
+kubectl describe pod pod-name
+kubectl logs pod-name -c container-name
+kubectl delete pod webapp
+
+kubectl get rs
+kubectl get replicasets
+kubectl describe rs rs-name
+
+
+creating Pods:
+
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: mypod
+  labels:
+    app: frontend
+
+spec:
+  containers:
+  - name: mypod
+    image: nginx
