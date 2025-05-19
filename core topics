@@ -6,6 +6,7 @@ Pods will run on the worker nodes.
 Basic Commands for POD:
 kubectl get pods -n default -o wide      
 kubectl create -f pod.yaml
+k run nameOfPod --image:image_name -n namespace
 kubectl apply -f pod.yaml
 kubectl describe pod pod-name
 kubectl logs pod-name -c container-name
@@ -21,8 +22,31 @@ kubectl edit rs rs-name
 
 Basic Commands for Deployment:
 kubectl get deployments
+k edit deployment deployment_name
 
 Deployment VS ReplicaSets vs Replication Controller
+RC- older version mostly immperative and now it is depricated
+RS- Good for auto provising the Pods
+DP- advanced RS supports rollbacks and rollouts properly.
+
+Basic Commands for Service:
+k get svc
+k get endpoints service_name
+
+basic commands for namespace:
+
+k create namespace namespace_name
+k get pods -A(or --all-namespaces)
+k get pod -n=marketing (or -n marketing)
+
+imperrative commands:
+
+k run pod-name --image=image_name --namespace=dev --port=8080 --labels=tier=db
+k expose pod pod-name --type=clusterIP --port=8080
+k create deployment deployment_name --image=image_name --replicas=2 
+k create svc clusterIP nameOfService --tcp=4842:8428
+
+correct way to access the service in other namespace is db-service.dev.svc.cluster.local
 
 creating Pods:
 
@@ -84,3 +108,54 @@ spec:
       containers:
       - name: container-name
         image: nginx
+
+creating Services:
+NodePort:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: s1
+  labels:
+    app: type
+spec:
+  type: NodePort
+  selector: 
+    key: value_of_deployment
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30435 (30000<=NodePort<=32000)
+
+ClusterIP and LoadBalancer:
+
+apiVersion: v1
+kind: Service
+metedata:
+  name: s2
+spec:
+  type: ClusterIP or LoadBalancer
+  selector:
+    name: name0fpods
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+ExternalName:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: s4
+spec:
+  type: ExternalName
+  externalName: example.com
+
+
+Creating Namespace:
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devhari
+
