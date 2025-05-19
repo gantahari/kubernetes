@@ -12,6 +12,9 @@ kubectl describe pod pod-name
 kubectl logs pod-name -c container-name
 kubectl delete pod webapp
 kubectl get pods --field-selector=status.phase=Running
+k replace --force -f pod.yaml
+k get pods[or all] --selector=env=dev --no-headers | wc -l // --selector=env=prod,bu=finance for and operations [or --selector=env=prod --selector=bu=finance for or operations
+
 
 Basic Commands for rs:
 kubectl get rs
@@ -46,6 +49,7 @@ k expose pod pod-name --type=clusterIP --port=8080
 k create deployment deployment_name --image=image_name --replicas=2 
 k create svc clusterIP nameOfService --tcp=4842:8428
 
+
 correct way to access the service in other namespace is db-service.dev.svc.cluster.local
 
 creating Pods:
@@ -59,9 +63,15 @@ metadata:
     app: frontend
 
 spec:
+  nodeName: node01
   containers:
   - name: mypod
     image: nginx
+  tolerations:
+    - key: "taintKey"
+      value: "taintValue"
+      operator: "Equal"
+      effect: "NoScheduling"
 
 
 creating RS:
@@ -158,4 +168,19 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: devhari
+
+
+
+Taints:
+To set taint: k taint nodes node01 taintKey=taintValue:[NoScheduling/preferNoScheduling/NoExecute]
+To Remove taint: k taint node node01 taintKey=taintValue:NoScheduling-  // hint: simply add - at end to remove taint
+
+NoScheduling-> Doesn't schedule if no tolerations set on POD
+preferNoScheduling-> Might schedule the pod if no tolerations set and no other nodes are available
+NoExecute-> make force evacivates if no tolarations set on pod.
+
+NodeAffinity:
+
+k describe node node01   // check lables
+k label node node01 color=blue
 
