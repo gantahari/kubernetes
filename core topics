@@ -3,17 +3,26 @@ It is a master worker node architecure.
 Master contains API server, Controllar Manager, Schedular and ETCD.
 Pods will run on the worker nodes.
 
+Basic Commands for POD:
 kubectl get pods -n default -o wide      
 kubectl create -f pod.yaml
 kubectl apply -f pod.yaml
 kubectl describe pod pod-name
 kubectl logs pod-name -c container-name
 kubectl delete pod webapp
+kubectl get pods --field-selector=status.phase=Running
 
+Basic Commands for rs:
 kubectl get rs
 kubectl get replicasets
 kubectl describe rs rs-name
+kubectl scale --replicas=5 rs rs-name
+kubectl edit rs rs-name
 
+Basic Commands for Deployment:
+kubectl get deployments
+
+Deployment VS ReplicaSets vs Replication Controller
 
 creating Pods:
 
@@ -29,3 +38,49 @@ spec:
   containers:
   - name: mypod
     image: nginx
+
+
+creating RS:
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rs-name
+  labels:
+    key: value
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      podname: pod1
+  template:
+    metadata:
+      labels:
+        podname: pod1
+    spec:
+      containers:
+        - name: containername
+          image: nginx
+
+
+
+creating Deployment:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment1
+  labels:
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      apps: t
+  template:
+    metadata:
+      labels:
+        apps: t
+    spec:
+      containers:
+      - name: container-name
+        image: nginx
