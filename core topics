@@ -73,6 +73,17 @@ spec:
       operator: "Equal"
       effect: "NoScheduling"
 
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:    // ignoredDuringSchedulingIgnoredDuringExecution
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: keyname
+            operator: In    // In, NotIn or Exists
+            values:
+            - value1
+            - value2 // if needed.
+
 
 creating RS:
 
@@ -183,4 +194,5 @@ NodeAffinity:
 
 k describe node node01   // check lables
 k label node node01 color=blue
+
 
