@@ -49,6 +49,9 @@ k expose pod pod-name --type=clusterIP --port=8080
 k create deployment deployment_name --image=image_name --replicas=2 
 k create svc clusterIP nameOfService --tcp=4842:8428
 
+Labels and Selectors:
+k describe node node01   // check lables
+k label node node01 color=blue
 
 correct way to access the service in other namespace is db-service.dev.svc.cluster.local
 
@@ -84,6 +87,7 @@ spec:
             - value1
             - value2 // if needed.
 
+  prorityClassName: high-pc
 
 creating RS:
 
@@ -182,7 +186,7 @@ metadata:
 
 
 
-Taints:
+Taints: It may keep p1 in n1 or it can keep p1 in any other node
 To set taint: k taint nodes node01 taintKey=taintValue:[NoScheduling/preferNoScheduling/NoExecute]
 To Remove taint: k taint node node01 taintKey=taintValue:NoScheduling-  // hint: simply add - at end to remove taint
 
@@ -190,9 +194,27 @@ NoScheduling-> Doesn't schedule if no tolerations set on POD
 preferNoScheduling-> Might schedule the pod if no tolerations set and no other nodes are available
 NoExecute-> make force evacivates if no tolarations set on pod.
 
-NodeAffinity:
+nodeSelector: It can keep p1 in only n1 but if you say keep p1 in n1 or n2 it can't
 
-k describe node node01   // check lables
-k label node node01 color=blue
+NodeAffinity: It can keep p1 in n1 or n2.
 
+Daemonsets: It ensure daemonset pod run in every node even if you add nodes. ex: kube-proxy. good for monitering and logging.
+It is same as replicaset but kind: Daemonset and it doesn't have any replicas.
+k get daemonsets
+k describe daemonsets name
+
+Static Pods: without api-server kubelet can create pods. It reads /etc/kubernetes/manifests folder and we can't create RS or deployments. used to deploy control plane componets.
+in /var/lib/kubelet/config.yaml file you can see --pod-manifest-path=folder_path_to_static_pods
+
+Priority Classes: to make priorities while scheduling. it can be in between -2Billion tp 1billion. but 1-2billions is used by k componets.
+
+k get priorityclass/pc
+kubectl get pods -o custom-columns="NAME:.metadata.name,PRIORITY:.spec.priorityClassName"
+
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: hig-pc
+value: 100000
+globalDefault: false
 
