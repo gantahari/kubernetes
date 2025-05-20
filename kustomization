@@ -1,0 +1,10 @@
+Kustomize: different kind of package or directory manager.
+
+kustomize build k8s/ | k apply -f -
+
+kind: Kustomization
+resources:
+  - ./db/
+  - ./message-broker/
+  - ./nginx/
+
