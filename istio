@@ -1,0 +1,31 @@
+Service Mesh is to enhance the service to service commumications.
+
+Istio, Linkerd, Consul are popular.
+
+Istio:
+1. Open Source
+2. Security(MTLS), efficent traffic mgmt(B/G, Cannary), fault tolarance and obervability
+3. can run on k8s, mesos etc...
+
+main components are sidecar proxy, gateway, virtual service, destination rule, fault injection.
+
+sidecar proxy: it adds a new container to every pod and it takes care of all the routing activities with mTLS. every request comes to main container should first reach to the sidecar and it routes.
+
+gateway: manages incoming and outgoing traffic just like NSG's
+  istiod: manages the polices, ceritificates
+  istio-ingressgateway: take cares of all the extern trafic comming into the mesh
+  istio-egressgateway: takes care of all the outgoing traffic from mesh. 
+  note: if a -> b have ingressgate then b -> a egreesgate is enabled by default but b -> a can't start request first.
+
+virtualservice: defines the set of rules for traffic coming from ingress gateway into the service mesh. like routing tables in azure
+
+destination rule: defines policies. After routing destination rules get applied.
+
+fault ingestion: for testing how services handles failures by introducing abort and delays.
+
+
+networking.istio.io/v1alpha3
+istioctl analyze
+kubectl label namespace default istio-injestion=enabled
+docker.io/istio/proxyv2:1.20.8 image is used for 
+
