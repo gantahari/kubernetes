@@ -23,6 +23,11 @@ destination rule: defines policies. After routing destination rules get applied.
 
 fault ingestion: for testing how services handles failures by introducing abort and delays.
 
+timeout: if request takes time to acts then you dont want your request to be in queue and so you want it to be fail and return some error code to work on.
+
+retries: if request get failed with some error like OOM killed error then you want to retry for some number of times instead of failing.
+by default it is 2times retry and 25ms of timeout it starts.
+
 
 networking.istio.io/v1alpha3
 istioctl analyze
