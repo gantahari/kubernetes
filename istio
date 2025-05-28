@@ -11,7 +11,7 @@ main components are sidecar proxy, gateway, virtual service, destination rule, f
 
 sidecar proxy: it adds a new container to every pod and it takes care of all the routing activities with mTLS. every request comes to main container should first reach to the sidecar and it routes.
 
-gateway: manages incoming and outgoing traffic just like NSG's
+gateway: manages incoming and outgoing traffic just like NSG's. It is a LB operating at the edge of mesh.
   istiod: manages the polices, ceritificates
   istio-ingressgateway: take cares of all the extern trafic comming into the mesh
   istio-egressgateway: takes care of all the outgoing traffic from mesh. 
@@ -27,5 +27,70 @@ fault ingestion: for testing how services handles failures by introducing abort 
 networking.istio.io/v1alpha3
 istioctl analyze
 kubectl label namespace default istio-injestion=enabled
-docker.io/istio/proxyv2:1.20.8 image is used for 
+docker.io/istio/proxyv2:1.20.8 image is used for sidecar proxy containers
 
+
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: httpbin-gateway
+spec:
+  selector:
+    istio: ingressgateway 
+  servers:
+  - port:
+      number: 80
+      protocol: HTTP
+      name: http
+    hosts:
+      - httpbin.example.com
+
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: httpbin
+spec:
+  hosts:
+  - "httpbin.example.com"
+  gateways:
+  - httpbin-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /status
+    - uri:
+        prefix: /api
+    route:
+    - destination:
+        port:
+          number: 8000
+        host: httpbin
+    faults:
+      delay:
+        fixedDelay: 2s
+        percentage:  
+          value: 50
+      abort:
+        httpStatus: 400
+        percentage:
+          value: 50
+    timeout: 10s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: OOMKilled
+
+
+
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: my-app-dr
+spec:
+  host: httpbin
+  subsets:
+  - name: v1
+    labels:
+      version: v1
