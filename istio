@@ -64,9 +64,13 @@ spec:
         prefix: /api
     route:
     - destination:
-        port:
-          number: 8000
         host: httpbin
+        subset: v1
+      weight: 30
+    - destination:
+        host: httpbin
+        subset: v2
+      weight: 70
     faults:
       delay:
         fixedDelay: 2s
